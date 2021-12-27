@@ -3,19 +3,28 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - fallOnPlayer
+  - diamond
+  - sand
+  - wall
+  - wallFloor
+  - rock
+  - sandOtherCollider
+  - live
+  - canvas
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - sand
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
+  - diamond
+  - rock
+  - rocktrigger
+  - cameratrigger
+  - player
   - 
   - 
   - 
