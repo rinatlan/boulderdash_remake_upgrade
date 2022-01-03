@@ -27,7 +27,16 @@ public class Rock : MonoBehaviour
             GetComponent<Rigidbody2D>().constraints = (RigidbodyConstraints2D.FreezePositionX) &
                                                       ~RigidbodyConstraints2D.FreezePositionY;
             _pushed = false;
+            // after rock was pushed and there is nothing under it - supposed to be dynamic and fall
+            RaycastHit2D[] downHits = Physics2D.RaycastAll(GetComponent<Rigidbody2D>().position, 
+                Vector2.down, 0.5f);
+            if (downHits.Length == 1)
+            {
+                GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
+            }
         }
+        
+        
     }
     
     private void OnCollisionEnter2D(Collision2D other)
@@ -38,7 +47,6 @@ public class Rock : MonoBehaviour
             gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
         }
 
-        // MoveInDir(other);
     }
 
     public void MoveInDir(Vector2 direction)
@@ -46,52 +54,47 @@ public class Rock : MonoBehaviour
         if (gameObject.GetComponent<Rigidbody2D>().bodyType == RigidbodyType2D.Static)
                 // player push to the right
             {
-                if (CanMove("right"))
+                if (CanMove(direction))
                 {
-                    print("b");
                     _currPos.x = 1;
                     _newPos = GetComponent<Rigidbody2D>().position + direction;
-                    Vector2 newVel = new Vector2(1f, 0);
                     GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
                     GetComponent<Rigidbody2D>().constraints = (~RigidbodyConstraints2D.FreezePositionX) &
                                                               RigidbodyConstraints2D.FreezePositionY;
                     GetComponent<Rigidbody2D>().MovePosition(_newPos);
-                    //
+                    
                     _pushed = true;
                 }
             }
     }
-    //
-    //
-    // NEW CODE HERE 
     
-    private bool CanMove(string directionToCheck)
+    
+    private bool CanMove(Vector2 directionToCheck)
     {
         Vector2 pos = gameObject.GetComponent<Rigidbody2D>().position;
         RaycastHit2D[] downHits = Physics2D.RaycastAll(pos, Vector2.down, 1f);
-        // not null for true
-        // foreach (var downHit in downHits)
-        // {
-        //     if ( (downHit.collider.CompareTag("sand") || 
-        //           downHit.collider.CompareTag("diamond") ||
-        //           downHit.collider.CompareTag("rock") ||
-        //           downHit.collider.CompareTag("wall") ||
-        //           downHit.collider.CompareTag("wallFloor")) &&
-        //          downHit.collider.GetComponent<Rigidbody2D>().position != pos) // there is object down
         if (downHits.Length > 0) // there is object down
-            {
-                if (directionToCheck == "right")
+            { 
+                if (directionToCheck == Vector2.right)
                 {
                     RaycastHit2D[] rightHits = Physics2D.RaycastAll(pos, Vector2.right, 1f);
                     if (rightHits.Length == 0) // nothing on right
                     {
                         return true;
                     }
-                    print(rightHits);
+                    return false;
+                }
+                
+                else if (directionToCheck == Vector2.left)
+                {
+                    RaycastHit2D[] rightHits = Physics2D.RaycastAll(pos, Vector2.left, 1f);
+                    if (rightHits.Length == 0) // nothing on left
+                    {
+                        return true;
+                    }
                     return false;
                 }
             }
-        print(downHits);
         return false;
     }
 
