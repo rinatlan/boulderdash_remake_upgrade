@@ -6,20 +6,25 @@ using UnityEngine;
 public class Rock : MonoBehaviour
 {
 
+    public Animator rockAnimator;
+    
     private Vector2 _currPos;
     public bool _pushed = false;
     private Vector2 _newPos;
+
+    private Collider2D[] hitsExplosion;
+    private Vector2 ExplosionPos;
     
     
     // Start is called before the first frame update
     void Start()
     {
-        
+        _newPos = GetComponent<Rigidbody2D>().position;
     }
     
     private void FixedUpdate()
     {
-        if (gameObject.GetComponent<Rigidbody2D>().position == _newPos &&
+        if ( gameObject.GetComponent<Rigidbody2D>().position == _newPos &&
             gameObject.GetComponent<Rigidbody2D>().bodyType == RigidbodyType2D.Kinematic)
         {
             _currPos = Vector2.zero;
@@ -36,7 +41,6 @@ public class Rock : MonoBehaviour
             }
         }
         
-        
     }
     
     private void OnCollisionEnter2D(Collision2D other)
@@ -51,8 +55,9 @@ public class Rock : MonoBehaviour
 
     public void MoveInDir(Vector2 direction)
     {
+        // player pushes the rock
         if (gameObject.GetComponent<Rigidbody2D>().bodyType == RigidbodyType2D.Static)
-                // player push to the right
+                // player push to the direction
             {
                 if (CanMove(direction))
                 {
@@ -71,6 +76,7 @@ public class Rock : MonoBehaviour
     
     private bool CanMove(Vector2 directionToCheck)
     {
+        // checks if rock can  move to direction
         Vector2 pos = gameObject.GetComponent<Rigidbody2D>().position;
         RaycastHit2D[] downHits = Physics2D.RaycastAll(pos, Vector2.down, 1f);
         if (downHits.Length > 0) // there is object down
@@ -96,6 +102,56 @@ public class Rock : MonoBehaviour
                 }
             }
         return false;
+    }
+
+    public void Explode()
+    {
+        // explodes the rock and objects near it
+        Vector2 size = new Vector2(2, 2);
+        ExplosionPos = gameObject.GetComponent<Rigidbody2D>().position;
+        gameObject.GetComponent<Animator>().SetTrigger("explosion");
+        hitsExplosion = Physics2D.OverlapBoxAll(ExplosionPos, size, 90);
+        foreach (var hit in hitsExplosion)
+        {
+            if (hit.gameObject.CompareTag("sand") ||
+                hit.gameObject.CompareTag("rock") ||
+                hit.gameObject.CompareTag("diamond") ||
+                hit.gameObject.CompareTag("Player"))
+            {
+                hit.gameObject.GetComponent<Animator>().SetTrigger("explosion");
+                if (hit.gameObject.CompareTag("Player"))
+                {
+                    GameManager.MinusLive();
+                }
+            }
+        }
+        Invoke("DontActivate", 3f);
+        
+    }
+    
+    
+    private void DontActivate()
+    {
+        // set active falls to game objects due explosion
+        foreach (var hit in hitsExplosion)
+        {
+            Vector2 newPos = _newPos;
+            if ( (!(hit.gameObject.name == "Door")) &&
+                 (!(hit.gameObject.CompareTag("wallFloor"))) &&
+                 !(hit.gameObject.CompareTag("squareCamera")))
+            {
+                newPos = hit.GetComponent<Transform>().position;
+                hit.gameObject.SetActive(false);
+            }
+
+            
+            RaycastHit2D hitAfterExplosion = Physics2D.Raycast(newPos, Vector2.up);
+            if (hitAfterExplosion.collider != null && hitAfterExplosion.collider.CompareTag("fallOnPlayer"))
+            {
+                hitAfterExplosion.collider.GetComponentInParent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
+            }
+        }
+        
     }
 
 

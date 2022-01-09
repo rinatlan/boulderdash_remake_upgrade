@@ -147,6 +147,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7606bf410680f0e44a0e9c0bff329adb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rockAnimator: {fileID: 2165932976391862767}
+  _pushed: 0
 --- !u!95 &2165932976391862767
 Animator:
   serializedVersion: 3

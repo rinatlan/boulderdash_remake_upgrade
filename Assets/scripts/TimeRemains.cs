@@ -34,15 +34,7 @@ public class TimeRemains : MonoBehaviour
                 _time.text = System.Convert.ToString(timeRemains);
                 timeRemains -= 1;
             }
-            else // GAME OVER
-            {
-                
-                //if (isTimeRuns)
-                //{
-                //    timeRemains = 0;
-                //    isTimeRuns = false;
-                //}
-            }
+            
             tick = 1;
             
         }

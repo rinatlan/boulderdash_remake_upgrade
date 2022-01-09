@@ -21,4 +21,5 @@ public class diamonds : MonoBehaviour
         int numDiamondsToDisplay = GameManager.GetDiamonds();
         _numEatenDiamonds.text = System.Convert.ToString(numDiamondsToDisplay);
     }
+    
 }

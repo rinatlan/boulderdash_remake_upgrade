@@ -14,12 +14,14 @@ public class Player : MonoBehaviour
     private Vector2 _movement;
     private float _moveSpeed = 5f;
     private bool moving;
-   
 
+    private float _tick = 7;
+    
     private void Awake()
     {
         _playerAnimator = GetComponent<Animator>();
         sound = FindObjectOfType<AudioSource>();
+        Physics2D.callbacksOnDisable = true;
     }
 
     // Start is called before the first frame update
@@ -76,6 +78,19 @@ public class Player : MonoBehaviour
         {
             hit.collider.GetComponent<Rock>().MoveInDir(_movement);
         }
+        
+        
+        // explodes the rock near player and what around it
+        
+        if (_tick > 0)
+        {
+            _tick -= Time.deltaTime;
+        }
+        else // if tick == 0, means 15 seconds passed, need to explode near rock
+        {
+            RockExplosion();
+            _tick = 7;
+        }
     }
 
     private void FixedUpdate()
@@ -97,8 +112,6 @@ public class Player : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D other)
     {
         gameObject.GetComponent<Rigidbody2D>().angularVelocity = 0.0f;
-        
-        
     }
     
    
@@ -131,8 +144,10 @@ public class Player : MonoBehaviour
                 var hits = Physics2D.OverlapBoxAll(lastPosPlayer, size, 90);
                 foreach (var hit in hits)
                 {
-                    if (hit.gameObject.CompareTag("wall") == false && hit.gameObject.CompareTag("wallFloor") == false && 
-                        hit.gameObject.CompareTag("fallOnPlayer") == false && hit.gameObject.CompareTag("sandOtherCollider") == false)
+                    if (hit.gameObject.CompareTag("wall") == false && 
+                        hit.gameObject.CompareTag("wallFloor") == false && 
+                        hit.gameObject.CompareTag("fallOnPlayer") == false && 
+                        hit.gameObject.CompareTag("sandOtherCollider") == false)
                     {
                         hit.gameObject.GetComponent<Animator>().SetTrigger("explosion");
                     }
@@ -182,8 +197,28 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void RockExplosion()
+    // do the blinking of the near rock to the player and calls the function that explodes what around this rock
+    {
+        Vector2 size = new Vector2(5, 5);
+        Vector2 lastPosPlayer = rigidBody2D.position;
+        var hits = Physics2D.OverlapBoxAll(lastPosPlayer, size, 90);
+        foreach (var hit in hits)
+        {
+            if (hit.gameObject.CompareTag("rock"))
+            {
+                hit.gameObject.GetComponent<Rock>().rockAnimator.SetBool("blink", true);
+                hit.gameObject.GetComponent<Rock>().Invoke("Explode", 3f);
+                break;
+            }
+        }
+        
+    }
+    
     public void dead()
     {
         GameManager.MinusLive();
     }
+    
+    
 }

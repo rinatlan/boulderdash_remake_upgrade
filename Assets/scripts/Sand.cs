@@ -22,4 +22,9 @@ public class Sand : MonoBehaviour
         
         gameObject.SetActive(false);
     }
+    
+    public void DontActivate()
+    {
+        gameObject.SetActive(false);
+    }
 }

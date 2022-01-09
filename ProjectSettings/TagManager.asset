@@ -13,6 +13,7 @@ TagManager:
   - sandOtherCollider
   - live
   - canvas
+  - squareCamera
   layers:
   - Default
   - TransparentFX

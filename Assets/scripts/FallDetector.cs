@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class FallDetector : MonoBehaviour
 {
+    private int playerWasUnder = 0;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -18,7 +20,7 @@ public class FallDetector : MonoBehaviour
               (other.transform.position.y < transform.position.y && other.CompareTag("rock")) ) &&
             Physics2D.Raycast(transform.position, Vector2.down, 0.2f).collider == null)
         {
-            GetComponentInParent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
+            GetComponentInParent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
         }
     }
 
